@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMS - Signup</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-box glass animate-fade-in">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h1>CMS</h1>
+                </div>
+                <h2>Create Account</h2>
+                <p>Join our management system today</p>
+            </div>
+
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="name" placeholder="Enter your full name" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" placeholder="Enter your email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Select Role</label>
+                    <div class="input-icon">
+                        <i class="fas fa-user-tag"></i>
+                        <select id="role" required>
+                            <option value="" disabled selected>Choose your role</option>
+                            <option value="admin">Admin</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="student">Student</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" placeholder="••••••••" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm</label>
+                        <div class="input-icon">
+                            <i class="fas fa-shield-alt"></i>
+                            <input type="password" id="confirm-password" placeholder="••••••••" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <label class="remember-me">
+                        <input type="checkbox" required> I agree to the <a href="#">Terms</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    Sign Up <i class="fas fa-user-plus"></i>
+                </button>
+            </form>
+
+            <div class="auth-bottom">
+                <p>Already have an account? <a href="index.html">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+
+</html>

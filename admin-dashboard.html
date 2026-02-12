@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CMS</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i>
+                <span>CMS Admin</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active" data-tab="overview">
+                        <i class="fas fa-th-large"></i> Overview
+                    </li>
+                    <li data-tab="students">
+                        <i class="fas fa-user-graduate"></i> Students
+                    </li>
+                    <li data-tab="teachers">
+                        <i class="fas fa-chalkboard-teacher"></i> Teachers
+                    </li>
+                    <li data-tab="classes">
+                        <i class="fas fa-school"></i> Classes
+                    </li>
+                    <li data-tab="subjects">
+                        <i class="fas fa-book"></i> Subjects
+                    </li>
+                    <li data-tab="settings">
+                        <i class="fas fa-cog"></i> Settings
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="Storage.logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search anything...">
+                </div>
+                <div class="top-bar-right">
+                    <button class="theme-toggle" onclick="Utils.toggleTheme()">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" alt="Admin">
+                        <span id="admin-name">Admin User</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Overview Tab -->
+                <section id="overview-tab" class="tab-content active">
+                    <div class="stats-grid">
+                        <div class="stat-card animate-slide-up">
+                            <div class="stat-icon purple"><i class="fas fa-user-graduate"></i></div>
+                            <div class="stat-info">
+                                <h3 id="stat-students">0</h3>
+                                <p>Total Students</p>
+                            </div>
+                        </div>
+                        <div class="stat-card animate-slide-up" style="animation-delay: 0.1s">
+                            <div class="stat-icon blue"><i class="fas fa-chalkboard-teacher"></i></div>
+                            <div class="stat-info">
+                                <h3 id="stat-teachers">0</h3>
+                                <p>Total Teachers</p>
+                            </div>
+                        </div>
+                        <div class="stat-card animate-slide-up" style="animation-delay: 0.2s">
+                            <div class="stat-icon pink"><i class="fas fa-school"></i></div>
+                            <div class="stat-info">
+                                <h3 id="stat-classes">0</h3>
+                                <p>Total Classes</p>
+                            </div>
+                        </div>
+                        <div class="stat-card animate-slide-up" style="animation-delay: 0.3s">
+                            <div class="stat-icon orange"><i class="fas fa-book"></i></div>
+                            <div class="stat-info">
+                                <h3 id="stat-subjects">0</h3>
+                                <p>Total Subjects</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-activity card mt-2">
+                        <div class="card-header">
+                            <h2>Recent Activity</h2>
+                            <button class="btn btn-sm">View All</button>
+                        </div>
+                        <div class="activity-list" id="recent-activity-list">
+                            <!-- Activities will be injected here -->
+                            <p class="text-muted text-center p-2">No recent activity found.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Students Tab -->
+                <section id="students-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2>Students Management</h2>
+                        <div class="filters">
+                            <select id="filter-fee" onchange="Admin.renderStudents()">
+                                <option value="">All Fee Status</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                            <select id="filter-class" onchange="Admin.renderStudents()">
+                                <option value="">All Classes</option>
+                                <!-- Populated via JS -->
+                            </select>
+                            <button class="btn btn-primary" onclick="Admin.openModal('student')">
+                                <i class="fas fa-plus"></i> Add Student
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container card">
+                        <table id="students-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Class</th>
+                                    <th>Roll No</th>
+                                    <th>Attendance</th>
+                                    <th>Performance</th>
+                                    <th>Fee Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Students data -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Teachers Tab -->
+                <section id="teachers-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2>Teachers Management</h2>
+                        <button class="btn btn-primary" onclick="Admin.openModal('teacher')">
+                            <i class="fas fa-plus"></i> Add Teacher
+                        </button>
+                    </div>
+                    <div class="table-container card">
+                        <table id="teachers-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Subject</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Classes Tab -->
+                <section id="classes-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2>Classes Management</h2>
+                        <button class="btn btn-primary" onclick="Admin.openModal('class')">
+                            <i class="fas fa-plus"></i> Add Class
+                        </button>
+                    </div>
+                    <div class="table-container card">
+                        <table id="classes-table">
+                            <thead>
+                                <tr>
+                                    <th>Class Name</th>
+                                    <th>Section</th>
+                                    <th>Class Teacher</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Subjects Tab -->
+                <section id="subjects-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2>Subjects Management</h2>
+                        <button class="btn btn-primary" onclick="Admin.openModal('subject')">
+                            <i class="fas fa-plus"></i> Add Subject
+                        </button>
+                    </div>
+                    <div class="table-container card">
+                        <table id="subjects-table">
+                            <thead>
+                                <tr>
+                                    <th>Subject Name</th>
+                                    <th>Subject Code</th>
+                                    <th>Teacher</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-container" class="modal-overlay">
+        <!-- Modals will be injected via JS -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

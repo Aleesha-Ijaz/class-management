@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - CMS</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css"> <!-- Reusing dashboard layout -->
+    <link rel="stylesheet" href="css/student.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i>
+                <span>CMS Student</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active" data-tab="overview">
+                        <i class="fas fa-home"></i> Dashboard
+                    </li>
+                    <li data-tab="classes">
+                        <i class="fas fa-book-reader"></i> My Classes
+                    </li>
+                    <li data-tab="attendance">
+                        <i class="fas fa-user-check"></i> My Attendance
+                    </li>
+                    <li data-tab="assignments">
+                        <i class="fas fa-tasks"></i> Assignments
+                    </li>
+                    <li data-tab="grades">
+                        <i class="fas fa-award"></i> My Grades
+                    </li>
+                    <li data-tab="profile">
+                        <i class="fas fa-user-circle"></i> My Profile
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="Storage.logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search my courses, assignments...">
+                </div>
+                <div class="top-bar-right">
+                    <button class="theme-toggle" onclick="Utils.toggleTheme()">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Student&background=ec4899&color=fff" alt="Student">
+                        <span id="student-name">Student Name</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Overview Tab -->
+                <section id="overview-tab" class="tab-content active">
+                    <div class="welcome-banner glass animate-fade-in">
+                        <div class="welcome-text">
+                            <h1>Hello, <span id="welcome-name">Student</span>! 👋</h1>
+                            <p>You have 3 assignments due this week. Stay on track!</p>
+                        </div>
+                        <div class="welcome-image">
+                            <!-- Could be an illustration -->
+                        </div>
+                    </div>
+
+                    <div class="stats-grid mt-2">
+                        <div class="stat-card animate-slide-up">
+                            <div class="stat-icon purple"><i class="fas fa-book"></i></div>
+                            <div class="stat-info">
+                                <h3 id="stat-courses">4</h3>
+                                <p>Courses Enrolled</p>
+                            </div>
+                        </div>
+                        <div class="stat-card animate-slide-up" style="animation-delay: 0.1s">
+                            <div class="stat-icon success-bg"><i class="fas fa-check-circle"></i></div>
+                            <div class="stat-info">
+                                <h3 id="stat-attendance-perc">92%</h3>
+                                <p>Attendance</p>
+                            </div>
+                        </div>
+                        <div class="stat-card animate-slide-up" style="animation-delay: 0.2s">
+                            <div class="stat-icon orange"><i class="fas fa-feather-alt"></i></div>
+                            <div class="stat-info">
+                                <h3 id="stat-avg-grade">A-</h3>
+                                <p>Overall Grade</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2 mt-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Today's Schedule</h2>
+                            </div>
+                            <div class="timeline" id="today-schedule">
+                                <!-- Dynamic content -->
+                                <p class="text-muted">No classes today.</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Recent Grades</h2>
+                            </div>
+                            <div class="grades-list" id="recent-grades">
+                                <!-- Dynamic content -->
+                                <p class="text-muted">No grades posted yet.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Classes Tab -->
+                <section id="classes-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2>My Enrolled Classes</h2>
+                    </div>
+                    <div class="classes-grid" id="enrolled-classes-list">
+                        <!-- Class Cards -->
+                    </div>
+                </section>
+
+                <!-- Attendance Tab -->
+                <section id="attendance-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2>My Attendance Records</h2>
+                    </div>
+                    <div class="card p-0">
+                        <div class="attendance-history" id="attendance-history-list">
+                            <!-- Table or Calendar view -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Assignments Tab -->
+                <section id="assignments-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2>My Assignments</h2>
+                        <div class="filters">
+                            <select id="assignment-status-filter">
+                                <option value="all">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="assignments-timeline" id="student-assignments-list">
+                        <!-- Assignment Timeline -->
+                    </div>
+                </section>
+
+                <!-- Grades Tab -->
+                <section id="grades-tab" class="tab-content">
+                    <div class="grades-container" id="student-grades-list">
+                        <!-- Semester-wise grades -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/student.js"></script>
+</body>
+
+</html>

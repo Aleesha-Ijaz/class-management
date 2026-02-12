@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - CMS</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css"> <!-- Reusing dashboard layout -->
+    <link rel="stylesheet" href="css/teacher.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i>
+                <span>CMS Teacher</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active" data-tab="overview">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </li>
+                    <li data-tab="attendance">
+                        <i class="fas fa-calendar-check"></i> Attendance
+                    </li>
+                    <li data-tab="assignments">
+                        <i class="fas fa-tasks"></i> Assignments
+                    </li>
+                    <li data-tab="grades">
+                        <i class="fas fa-star"></i> Grades/Marks
+                    </li>
+                    <li data-tab="my-classes">
+                        <i class="fas fa-chalkboard"></i> My Classes
+                    </li>
+                    <li data-tab="profile">
+                        <i class="fas fa-user-circle"></i> Profile
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="Storage.logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search students, assignments...">
+                </div>
+                <div class="top-bar-right">
+                    <button class="theme-toggle" onclick="Utils.toggleTheme()">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Teacher&background=10b981&color=fff" alt="Teacher">
+                        <span id="teacher-name">Teacher Name</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Overview Tab -->
+                <section id="overview-tab" class="tab-content active">
+                    <div class="stats-grid">
+                        <div class="stat-card animate-slide-up">
+                            <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+                            <div class="stat-info">
+                                <h3 id="stat-total-students">0</h3>
+                                <p>My Students</p>
+                            </div>
+                        </div>
+                        <div class="stat-card animate-slide-up" style="animation-delay: 0.1s">
+                            <div class="stat-icon blue"><i class="fas fa-clock"></i></div>
+                            <div class="stat-info">
+                                <h3 id="stat-pending-assignments">0</h3>
+                                <p>Active Assignments</p>
+                            </div>
+                        </div>
+                        <div class="stat-card animate-slide-up" style="animation-delay: 0.2s">
+                            <div class="stat-icon success-bg"><i class="fas fa-check-double"></i></div>
+                            <div class="stat-info">
+                                <h3 id="stat-avg-attendance">0%</h3>
+                                <p>Avg. Attendance</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2 mt-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Upcoming Classes</h2>
+                            </div>
+                            <div class="list-container" id="upcoming-classes">
+                                <!-- Dynamic content -->
+                                <p class="text-muted">No classes scheduled.</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Pending Assignments</h2>
+                            </div>
+                            <div class="list-container" id="pending-grading">
+                                <!-- Dynamic content -->
+                                <p class="text-muted">All caught up!</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Attendance Tab -->
+                <section id="attendance-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2>Attendance Marking</h2>
+                        <div class="filters">
+                            <select id="attendance-class-select">
+                                <option value="" disabled selected>Select Class</option>
+                            </select>
+                            <input type="date" id="attendance-date" value="${new Date().toISOString().split('T')[0]}">
+                            <button class="btn btn-primary" onclick="Teacher.loadAttendanceList()">
+                                <i class="fas fa-sync"></i> Load List
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container card">
+                        <table id="attendance-table">
+                            <thead>
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Student Name</th>
+                                    <th>Status</th>
+                                    <th>Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div class="table-footer p-1">
+                            <button class="btn btn-primary" onclick="Teacher.saveAttendance()">
+                                <i class="fas fa-save"></i> Save Attendance
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Assignments Tab -->
+                <section id="assignments-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2>Assignments Management</h2>
+                        <button class="btn btn-primary" onclick="Teacher.openAssignmentModal()">
+                            <i class="fas fa-plus"></i> Create Assignment
+                        </button>
+                    </div>
+                    <div class="assignments-grid" id="assignments-list">
+                        <!-- Assignment Cards -->
+                    </div>
+                </section>
+
+                <!-- Grades Tab -->
+                <section id="grades-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2>Grades & Marks</h2>
+                    </div>
+                    <div class="card filter-card mb-1">
+                        <div class="grid-3">
+                            <select id="grades-class-select">
+                                <option>Select Class</option>
+                            </select>
+                            <select id="grades-subject-select">
+                                <option>Select Subject</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="Teacher.loadGradesTable()">View Marks</button>
+                        </div>
+                    </div>
+                    <div class="table-container card">
+                        <table id="grades-table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Marks (100)</th>
+                                    <th>Grade</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-container" class="modal-overlay"></div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/teacher.js"></script>
+</body>
+
+</html>
