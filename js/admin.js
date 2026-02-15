@@ -40,6 +40,8 @@ const Admin = {
                 if (target === 'students') Admin.renderStudents();
                 if (target === 'teachers') Admin.renderTeachers();
                 if (target === 'classes') Admin.renderClasses();
+                if (target === 'subjects') Admin.renderSubjects();
+                if (target === 'schedule') Admin.renderSchedule();
                 if (target === 'overview') Admin.loadStats();
             });
         });
@@ -195,6 +197,120 @@ const Admin = {
         `).join('');
     },
 
+    // Consolidated Schedule CRUD
+    renderSchedule: () => {
+        const view = document.getElementById('schedule-view-selector').value;
+        const head = document.getElementById('schedule-table-head');
+        const body = document.getElementById('schedule-table-body');
+
+        if (view === 'timetable') {
+            const data = Storage.get(Storage.KEYS.TIMETABLES);
+            head.innerHTML = `<tr><th>Class</th><th>Subject</th><th>Day</th><th>Time</th><th>Teacher</th><th>Actions</th></tr>`;
+            body.innerHTML = data.map(t => `
+                <tr>
+                    <td>${t.class}</td>
+                    <td>${t.subject}</td>
+                    <td>${t.day}</td>
+                    <td>${t.time}</td>
+                    <td>${t.teacher}</td>
+                    <td class="actions">
+                        <button class="btn-icon btn-edit" title="Edit" onclick="Admin.editTimetable('${t.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-delete" title="Delete" onclick="Admin.deleteTimetable('${t.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        } else if (view === 'exams') {
+            const data = Storage.get(Storage.KEYS.EXAMS);
+            head.innerHTML = `<tr><th>Title</th><th>Class</th><th>Date</th><th>Actions</th></tr>`;
+            body.innerHTML = data.map(e => `
+                <tr>
+                    <td>${e.title}</td>
+                    <td>${e.class}</td>
+                    <td>${e.dueDate || 'N/A'}</td>
+                    <td class="actions">
+                        <button class="btn-icon btn-edit" title="Edit" onclick="Admin.editTask('${e.id}', 'Exam')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-delete" title="Delete" onclick="Admin.deleteTask('${e.id}', 'Exam')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        } else if (view === 'events') {
+            const data = Storage.get(Storage.KEYS.EVENTS);
+            head.innerHTML = `<tr><th>Event Name</th><th>Date</th><th>Venue</th><th>Actions</th></tr>`;
+            body.innerHTML = data.map(e => `
+                <tr>
+                    <td><strong>${e.name}</strong></td>
+                    <td>${e.date}</td>
+                    <td>${e.venue}</td>
+                    <td class="actions">
+                        <button class="btn-icon btn-edit" title="Edit" onclick="Admin.editEvent('${e.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-delete" title="Delete" onclick="Admin.deleteEvent('${e.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        Admin.renderScheduleChart();
+    },
+
+    renderScheduleChart: () => {
+        const ctx = document.getElementById('scheduleChart')?.getContext('2d');
+        if (!ctx) return;
+
+        // Destroy existing chart if it exists
+        if (Admin.scheduleChartInstance) Admin.scheduleChartInstance.destroy();
+
+        const timetables = Storage.get(Storage.KEYS.TIMETABLES).length;
+        const exams = Storage.get(Storage.KEYS.EXAMS).length;
+        const events = Storage.get(Storage.KEYS.EVENTS).length;
+
+        Admin.scheduleChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Class Timetable', 'Exams', 'Events'],
+                datasets: [{
+                    label: 'Count of Entries',
+                    data: [timetables, exams, events],
+                    backgroundColor: [
+                        'rgba(99, 102, 241, 0.6)', // Purple
+                        'rgba(236, 72, 153, 0.6)', // Pink
+                        'rgba(59, 130, 246, 0.6)'  // Blue
+                    ],
+                    borderColor: [
+                        'rgb(99, 102, 241)',
+                        'rgb(236, 72, 153)',
+                        'rgb(59, 130, 246)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    },
+
+    handleNewScheduleEntry: () => {
+        const view = document.getElementById('schedule-view-selector').value;
+        if (view === 'timetable') Admin.openModal('timetable');
+        else if (view === 'exams') Admin.openModal('task', { type: 'Exam' });
+        else if (view === 'events') Admin.openModal('event');
+    },
+
     openModal: (type, data = null) => {
         const container = document.getElementById('modal-container');
         let modalHtml = '';
@@ -207,6 +323,12 @@ const Admin = {
             modalHtml = Admin.getClassModalHtml(data);
         } else if (type === 'subject') {
             modalHtml = Admin.getSubjectModalHtml(data);
+        } else if (type === 'task') {
+            modalHtml = Admin.getTaskModalHtml(data);
+        } else if (type === 'timetable') {
+            modalHtml = Admin.getTimetableModalHtml(data);
+        } else if (type === 'event') {
+            modalHtml = Admin.getEventModalHtml(data);
         }
 
         container.innerHTML = modalHtml;
@@ -262,6 +384,136 @@ const Admin = {
             </form>
         </div>
     `,
+
+    getTimetableModalHtml: (data) => {
+        const classes = Storage.get(Storage.KEYS.CLASSES);
+        const subjects = Storage.get(Storage.KEYS.SUBJECTS);
+        const teachers = Storage.get(Storage.KEYS.TEACHERS);
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+        return `
+            <div class="modal modal-dark animate-slide-up">
+                <div class="modal-header">
+                    <h2>${data ? 'Edit' : 'Add'} Timetable Entry</h2>
+                    <button class="btn-close" onclick="Admin.closeModal()">&times;</button>
+                </div>
+                <form id="timetableForm" class="auth-form">
+                    <input type="hidden" id="entity-id" value="${data ? data.id : ''}">
+                    <div class="grid-2 mb-1">
+                        <div class="form-group">
+                            <label>Class</label>
+                            <select id="class" required>
+                                <option value="">Select Class</option>
+                                ${[...new Set(classes.map(c => c.name))].map(c => `<option value="${c}" ${data && data.class === c ? 'selected' : ''}>${c}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <select id="subject" required>
+                                <option value="">Select Subject</option>
+                                ${subjects.map(s => `<option value="${s.name}" ${data && data.subject === s.name ? 'selected' : ''}>${s.name}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid-2 mb-1">
+                        <div class="form-group">
+                            <label>Day</label>
+                            <select id="day" required>
+                                ${days.map(d => `<option value="${d}" ${data && data.day === d ? 'selected' : ''}>${d}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Time</label>
+                            <input type="text" id="time" value="${data ? data.time : ''}" placeholder="e.g. 09:00 AM - 10:00 AM" required>
+                        </div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label>Teacher</label>
+                        <select id="teacher" required>
+                            <option value="">Select Teacher</option>
+                            ${teachers.map(t => `<option value="${t.name}" ${data && data.teacher === t.name ? 'selected' : ''}>${t.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-save mr-1"></i> Save Entry
+                    </button>
+                </form>
+            </div>
+        `;
+    },
+
+    getEventModalHtml: (data) => `
+        <div class="modal modal-dark animate-slide-up">
+            <div class="modal-header">
+                <h2>${data ? 'Edit' : 'Add'} Event</h2>
+                <button class="btn-close" onclick="Admin.closeModal()">&times;</button>
+            </div>
+            <form id="eventForm" class="auth-form">
+                <input type="hidden" id="entity-id" value="${data ? data.id : ''}">
+                <div class="form-group mb-1">
+                    <label>Event Name</label>
+                    <input type="text" id="name" value="${data ? data.name : ''}" placeholder="e.g. Annual Sports Day" required>
+                </div>
+                <div class="grid-2 mb-1">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="date" value="${data ? data.date : ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Venue</label>
+                        <input type="text" id="venue" value="${data ? data.venue : ''}" placeholder="e.g. School Ground" required>
+                    </div>
+                </div>
+                <div class="form-group mb-2">
+                    <label>Description</label>
+                    <textarea id="description" placeholder="Short description of the event" required>${data ? data.description : ''}</textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-save mr-1"></i> Save Event
+                </button>
+            </form>
+        </div>
+    `,
+
+    getTaskModalHtml: (data) => {
+        const classes = Storage.get(Storage.KEYS.CLASSES);
+        return `
+            <div class="modal modal-dark animate-slide-up">
+                <div class="modal-header">
+                    <h2>${data ? 'Edit' : 'Add'} Task</h2>
+                    <button class="btn-close" onclick="Admin.closeModal()">&times;</button>
+                </div>
+                <form id="taskForm" class="auth-form">
+                    <input type="hidden" id="entity-id" value="${data ? data.id : ''}">
+                    <div class="form-group mb-1">
+                        <label>Title</label>
+                        <input type="text" id="title" value="${data ? data.title : ''}" placeholder="Enter title" required>
+                    </div>
+                    <div class="grid-2 mb-1">
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select id="task-type" required>
+                                <option value="Exam" ${data && data.type === 'Exam' ? 'selected' : ''}>Exam</option>
+                                <option value="Assignment" ${data && data.type === 'Assignment' ? 'selected' : ''}>Assignment</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Class</label>
+                            <select id="class" required>
+                                <option value="">Select Class</option>
+                                ${[...new Set(classes.map(c => c.name))].map(c => `<option value="${c}" ${data && data.class === c ? 'selected' : ''}>${c}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label>Due Date</label>
+                        <input type="date" id="dueDate" value="${data ? data.dueDate : ''}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Save Task</button>
+                </form>
+            </div>
+        `;
+    },
 
     getTeacherModalHtml: (data) => `
         <div class="modal modal-dark animate-slide-up">
@@ -385,9 +637,12 @@ const Admin = {
             'student': Storage.KEYS.STUDENTS,
             'teacher': Storage.KEYS.TEACHERS,
             'class': Storage.KEYS.CLASSES,
-            'subject': Storage.KEYS.SUBJECTS
+            'subject': Storage.KEYS.SUBJECTS,
+            'task': null, // Handled dynamically below
+            'timetable': Storage.KEYS.TIMETABLES,
+            'event': Storage.KEYS.EVENTS
         };
-        const key = keyMap[type];
+        let key = keyMap[type];
 
         const formData = {};
         const inputs = document.querySelectorAll('#modal-container input, #modal-container select');
@@ -395,6 +650,11 @@ const Admin = {
             if (input.id !== 'entity-id') formData[input.id] = input.value;
         });
         formData.id = id || Utils.generateId();
+
+        if (type === 'task') {
+            const taskType = document.getElementById('task-type').value;
+            key = taskType === 'Exam' ? Storage.KEYS.EXAMS : Storage.KEYS.ASSIGNMENTS;
+        }
 
         if (id) {
             Storage.update(key, id, formData);
@@ -405,7 +665,11 @@ const Admin = {
         }
 
         Admin.closeModal();
-        Admin[`render${type.charAt(0).toUpperCase() + type.slice(1)}s`]();
+        if (type === 'task' || type === 'timetable' || type === 'event') {
+            Admin.renderSchedule();
+        } else {
+            Admin[`render${type.charAt(0).toUpperCase() + type.slice(1)}s`]();
+        }
         Admin.loadStats();
         if (type === 'student') Admin.populateStudentFilters();
     },
@@ -459,6 +723,21 @@ const Admin = {
     editTeacher: (id) => Admin.openModal('teacher', Storage.get(Storage.KEYS.TEACHERS).find(t => t.id === id)),
     editClass: (id) => Admin.openModal('class', Storage.get(Storage.KEYS.CLASSES).find(c => c.id === id)),
     editSubject: (id) => Admin.openModal('subject', Storage.get(Storage.KEYS.SUBJECTS).find(s => s.id === id)),
+    editTask: (id, type) => {
+        const key = type === 'Exam' ? Storage.KEYS.EXAMS : Storage.KEYS.ASSIGNMENTS;
+        const task = Storage.get(key).find(t => t.id === id);
+        if (task) Admin.openModal('task', { ...task, type });
+    },
+
+    editTimetable: (id) => {
+        const entry = Storage.get(Storage.KEYS.TIMETABLES).find(t => t.id === id);
+        if (entry) Admin.openModal('timetable', entry);
+    },
+
+    editEvent: (id) => {
+        const event = Storage.get(Storage.KEYS.EVENTS).find(e => e.id === id);
+        if (event) Admin.openModal('event', event);
+    },
 
     deleteStudent: (id) => Admin.showDeleteConfirmation(id, 'Student', () => {
         Admin.deleteEntity(Storage.KEYS.STUDENTS, id, 'Student');
@@ -470,6 +749,27 @@ const Admin = {
     }),
     deleteSubject: (id) => Admin.showDeleteConfirmation(id, 'Subject', () => {
         Admin.deleteEntity(Storage.KEYS.SUBJECTS, id, 'Subject');
+    }),
+    deleteTask: (id, type) => Admin.showDeleteConfirmation(id, type, () => {
+        const key = type === 'Exam' ? Storage.KEYS.EXAMS : Storage.KEYS.ASSIGNMENTS;
+        Storage.delete(key, id);
+        Utils.showToast(`${type} deleted successfully`, 'success');
+        Admin.renderSchedule();
+        Admin.loadStats();
+    }),
+
+    deleteTimetable: (id) => Admin.showDeleteConfirmation(id, 'Timetable Entry', () => {
+        Storage.delete(Storage.KEYS.TIMETABLES, id);
+        Utils.showToast(`Timetable entry deleted successfully`, 'success');
+        Admin.renderSchedule();
+        Admin.loadStats();
+    }),
+
+    deleteEvent: (id) => Admin.showDeleteConfirmation(id, 'Event', () => {
+        Storage.delete(Storage.KEYS.EVENTS, id);
+        Utils.showToast(`Event deleted successfully`, 'success');
+        Admin.renderSchedule();
+        Admin.loadStats();
     }),
 
     deleteEntity: (key, id, label) => {
