@@ -12,6 +12,8 @@
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -38,6 +40,9 @@
                     </li>
                     <li data-tab="subjects">
                         <i class="fas fa-book"></i> Subjects
+                    </li>
+                    <li data-tab="schedule">
+                        <i class="fas fa-calendar-check"></i> Schedule Management
                     </li>
                     <li data-tab="settings">
                         <i class="fas fa-cog"></i> Settings
@@ -224,6 +229,43 @@
                                 </tr>
                             </thead>
                             <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Consolidated Schedule Management Tab -->
+                <section id="schedule-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2>Schedule Management & Analytics</h2>
+                        <div class="filters">
+                            <select id="schedule-view-selector" onchange="Admin.renderSchedule()">
+                                <option value="timetable">Class Timetable</option>
+                                <option value="exams">Exam Schedule</option>
+                                <option value="events">Events</option>
+                            </select>
+                            <button class="btn btn-primary" id="add-schedule-btn"
+                                onclick="Admin.handleNewScheduleEntry()">
+                                <i class="fas fa-plus"></i> Add Entry
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Section -->
+                    <div class="grid-1 mb-2">
+                        <div class="card chart-container">
+                            <canvas id="scheduleChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Table Section -->
+                    <div class="table-container card">
+                        <table id="schedule-table">
+                            <thead id="schedule-table-head">
+                                <!-- Dynamic headers based on view -->
+                            </thead>
+                            <tbody id="schedule-table-body">
+                                <!-- Dynamic rows based on view -->
+                            </tbody>
                         </table>
                     </div>
                 </section>
