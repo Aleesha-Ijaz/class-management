@@ -273,7 +273,7 @@ const Admin = {
                 labels: labels,
                 datasets: [
                     {
-                        label: 'Timetables',
+                        label: 'Class timetable',
                         data: [timetablesData.length, timetablesData.length + 1, timetablesData.length - 1, timetablesData.length + 2, timetablesData.length],
                         borderColor: '#5eb344', // Vibrant Green
                         backgroundColor: '#5eb344',
@@ -284,7 +284,7 @@ const Admin = {
                         pointBackgroundColor: '#5eb344'
                     },
                     {
-                        label: 'Exams',
+                        label: 'Exam schedule',
                         data: [examsData.length, examsData.length - 1, examsData.length + 2, examsData.length - 2, examsData.length + 1],
                         borderColor: '#d35400', // Earthy Orange
                         backgroundColor: '#d35400',
@@ -295,7 +295,7 @@ const Admin = {
                         pointBackgroundColor: '#d35400'
                     },
                     {
-                        label: 'Events',
+                        label: 'Event management',
                         data: [eventsData.length + 1, eventsData.length, eventsData.length - 1, eventsData.length + 1, eventsData.length + 2],
                         borderColor: '#3498db', // Blue
                         backgroundColor: '#3498db',
