@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin.css"> <!-- Reusing dashboard layout -->
@@ -185,10 +187,150 @@
 
                 <!-- Grades Tab -->
                 <section id="grades-tab" class="tab-content">
-                    <div class="grades-container" id="student-grades-list">
-                        <!-- Semester-wise grades -->
+                    <div class="section-header">
+                        <h2>Performance & Grades</h2>
                     </div>
-                </section>
+
+                    <div class="performance-grid">
+                        <!-- GPA Card -->
+                        <div class="card gpa-card animate-slide-up">
+                            <div class="gpa-content">
+                                <div class="gpa-value">3.85</div>
+                                <div class="gpa-label">Current CGPA</div>
+                            </div>
+                            <div class="gpa-details">
+                                <span><i class="fas fa-arrow-up text-success"></i> +0.15 this semester</span>
+                            </div>
+                        </div>
+
+                        <!-- Attendance Summary Card -->
+                        <div class="card attendance-summary-card animate-slide-up" style="animation-delay: 0.1s">
+                            <h3>Attendance Record</h3>
+                            <div class="attendance-chart-container">
+                                <canvas id="attendanceDoughnut"></canvas>
+                                <div class="attendance-percentage">92%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2 mt-2">
+                        <!-- Progress Chart -->
+                        <div class="card animate-slide-up" style="animation-delay: 0.2s">
+                            <div class="card-header">
+                                <h2>Academic Progress</h2>
+                            </div>
+                            <div class="chart-container" style="height: 250px;">
+                                <canvas id="gradeProgressChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Subject-wise Grades -->
+                        <div class="card animate-slide-up" style="animation-delay: 0.3s">
+                            <div class="card-header">
+                                <h2>Subject-wise Grades</h2>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="grade-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Score</th>
+                                            <th>Grade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="student-grades-table-body">
+                                        <!-- Dynamic content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Profile Tab -->
+                    <section id="profile-tab" class="tab-content">
+                        <div class="grid-2">
+                            <!-- Edit Profile Card -->
+                            <div class="card animate-slide-up">
+                                <div class="card-header">
+                                    <h2><i class="fas fa-user-edit mr-1"></i> Edit Profile</h2>
+                                </div>
+                                <form id="profile-form" onsubmit="event.preventDefault(); Student.updateProfile();">
+                                    <div class="form-group">
+                                        <label>Full Name</label>
+                                        <input type="text" id="profile-name" class="form-control"
+                                            placeholder="Your Name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email Address</label>
+                                        <input type="email" id="profile-email" class="form-control" placeholder="Email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Phone Number</label>
+                                        <input type="text" id="profile-phone" class="form-control"
+                                            placeholder="Phone Number">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-1">Save Profile Changes</button>
+                                </form>
+                            </div>
+
+                            <div class="profile-settings-column">
+                                <!-- Change Password Card -->
+                                <div class="card animate-slide-up" style="animation-delay: 0.1s">
+                                    <div class="card-header">
+                                        <h2><i class="fas fa-lock mr-1"></i> Change Password</h2>
+                                    </div>
+                                    <form id="password-form"
+                                        onsubmit="event.preventDefault(); Student.changePassword();">
+                                        <div class="form-group">
+                                            <label>Current Password</label>
+                                            <input type="password" id="current-password" class="form-control"
+                                                placeholder="••••••••">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>New Password</label>
+                                            <input type="password" id="new-password" class="form-control"
+                                                placeholder="••••••••">
+                                        </div>
+                                        <button type="submit" class="btn btn-secondary mt-1">Update Password</button>
+                                    </form>
+                                </div>
+
+                                <!-- Notification Settings Card -->
+                                <div class="card mt-2 animate-slide-up" style="animation-delay: 0.2s">
+                                    <div class="card-header">
+                                        <h2><i class="fas fa-bell mr-1"></i> Notifications</h2>
+                                    </div>
+                                    <div class="settings-list">
+                                        <div class="setting-item">
+                                            <div class="setting-info">
+                                                <h4>Email Notifications</h4>
+                                                <p>Receive updates about assignments and grades.</p>
+                                            </div>
+                                            <label class="switch">
+                                                <input type="checkbox" checked onchange="Student.saveSettings()">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="setting-item mt-1">
+                                            <div class="setting-info">
+                                                <h4>Push Notifications</h4>
+                                                <p>Get instant alerts on your mobile device.</p>
+                                            </div>
+                                            <label class="switch">
+                                                <input type="checkbox" onchange="Student.saveSettings()">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Logout Card -->
+                                <button class="btn btn-danger btn-block mt-2 animate-slide-up"
+                                    style="animation-delay: 0.3s" onclick="Storage.logout()">
+                                    <i class="fas fa-sign-out-alt mr-1"></i> Logout from Session
+                                </button>
+                            </div>
+                        </div>
+                    </section>
             </div>
             <!-- Modal Container for Course Details, Materials, etc. -->
             <div id="modal-container" class="modal-container" style="display: none;"></div>
