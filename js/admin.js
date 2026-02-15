@@ -125,12 +125,14 @@ const Admin = {
             <tr>
                 <td>${t.name}</td>
                 <td>${t.email}</td>
-                <td>${t.subject || 'N/A'}</td>
+                <td><span class="badge badge-info">${t.subject || 'N/A'}</span></td>
+                <td><span class="badge badge-purple">${t.performance || 'N/A'}%</span></td>
+                <td><span class="badge badge-success">$${t.salary || '0'}</span></td>
                 <td class="actions">
-                    <button class="btn-icon btn-edit" onclick="Admin.editTeacher('${t.id}')">
+                    <button class="btn-icon btn-edit" title="Edit Teacher" onclick="Admin.editTeacher('${t.id}')">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn-icon btn-delete" onclick="Admin.deleteTeacher('${t.id}')">
+                    <button class="btn-icon btn-delete" title="Delete Teacher" onclick="Admin.deleteTeacher('${t.id}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -138,14 +140,9 @@ const Admin = {
         `).join('');
     },
 
-    deleteTeacher: (id) => {
-        if (confirm('Are you sure you want to delete this teacher?')) {
-            Storage.delete(Storage.KEYS.TEACHERS, id);
-            Utils.showToast('Teacher deleted successfully', 'success');
-            Admin.renderTeachers();
-            Admin.loadStats();
-        }
-    },
+    deleteTeacher: (id) => Admin.showDeleteConfirmation(id, 'Teacher', () => {
+        Admin.deleteEntity(Storage.KEYS.TEACHERS, id, 'Teacher');
+    }),
 
     // Classes CRUD
     renderClasses: (filter = '') => {
@@ -262,26 +259,38 @@ const Admin = {
     `,
 
     getTeacherModalHtml: (data) => `
-        <div class="modal">
+        <div class="modal modal-dark animate-slide-up">
             <div class="modal-header">
                 <h2>${data ? 'Edit' : 'Add'} Teacher</h2>
                 <button class="btn-close" onclick="Admin.closeModal()">&times;</button>
             </div>
             <form id="teacherForm" class="auth-form">
                 <input type="hidden" id="entity-id" value="${data ? data.id : ''}">
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="name" value="${data ? data.name : ''}" required>
+                <div class="form-group mb-1">
+                    <label><i class="fas fa-user mr-1"></i> Full Name</label>
+                    <input type="text" id="name" value="${data ? data.name : ''}" placeholder="Enter teacher name" required>
                 </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="email" value="${data ? data.email : ''}" required>
+                <div class="form-group mb-1">
+                    <label><i class="fas fa-envelope mr-1"></i> Email Address</label>
+                    <input type="email" id="email" value="${data ? data.email : ''}" placeholder="teacher@cms.com" required>
                 </div>
-                <div class="form-group">
-                    <label>Subject</label>
-                    <input type="text" id="subject" value="${data ? data.subject : ''}" required>
+                <div class="form-group mb-1">
+                    <label><i class="fas fa-book mr-1"></i> Assigned Subject</label>
+                    <input type="text" id="subject" value="${data ? data.subject : ''}" placeholder="e.g. Mathematics" required>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">Save Teacher</button>
+                <div class="grid-2 mb-2">
+                    <div class="form-group">
+                        <label><i class="fas fa-chart-line mr-1"></i> Performance (%)</label>
+                        <input type="number" id="performance" value="${data ? data.performance : ''}" placeholder="0-100" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-money-bill-wave mr-1"></i> Salary ($)</label>
+                        <input type="number" id="salary" value="${data ? data.salary : ''}" placeholder="e.g. 5000">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-save mr-1"></i> Save Teacher Changes
+                </button>
             </form>
         </div>
     `,
