@@ -151,20 +151,35 @@
                     </div>
                 </section>
 
-                <!-- Assignments Tab -->
+                <!-- Assignments & Exams Tab -->
                 <section id="assignments-tab" class="tab-content">
                     <div class="section-header">
-                        <h2>My Assignments</h2>
-                        <div class="filters">
-                            <select id="assignment-status-filter">
-                                <option value="all">All Status</option>
-                                <option value="pending">Pending</option>
-                                <option value="completed">Completed</option>
-                            </select>
+                        <h2>Assignments & Exams</h2>
+                        <div class="tab-sub-nav">
+                            <button class="active"
+                                onclick="Student.switchAssignmentView('assignments')">Assignments</button>
+                            <button onclick="Student.switchAssignmentView('exams')">Exam Schedule</button>
                         </div>
                     </div>
-                    <div class="assignments-timeline" id="student-assignments-list">
-                        <!-- Assignment Timeline -->
+
+                    <div id="assignment-view-container">
+                        <div class="filters mb-2">
+                            <select id="assignment-status-filter" onchange="Student.renderAssignments()">
+                                <option value="all">All Assignments</option>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="submitted">Submitted</option>
+                                <option value="graded">Graded & Feedback</option>
+                            </select>
+                        </div>
+                        <div class="assignments-timeline" id="student-assignments-list">
+                            <!-- Assignment Items -->
+                        </div>
+                    </div>
+
+                    <div id="exam-view-container" style="display: none;">
+                        <div class="exams-grid" id="student-exams-list">
+                            <!-- Exam Cards -->
+                        </div>
                     </div>
                 </section>
 
