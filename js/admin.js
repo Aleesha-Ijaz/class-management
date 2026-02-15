@@ -253,35 +253,59 @@ const Admin = {
     },
 
     renderScheduleChart: () => {
-        const ctx = document.getElementById('scheduleChart')?.getContext('2d');
+        const canvas = document.getElementById('scheduleChart');
+        const ctx = canvas?.getContext('2d');
         if (!ctx) return;
 
         // Destroy existing chart if it exists
         if (Admin.scheduleChartInstance) Admin.scheduleChartInstance.destroy();
 
-        const timetables = Storage.get(Storage.KEYS.TIMETABLES).length;
-        const exams = Storage.get(Storage.KEYS.EXAMS).length;
-        const events = Storage.get(Storage.KEYS.EVENTS).length;
+        const timetablesData = Storage.get(Storage.KEYS.TIMETABLES);
+        const examsData = Storage.get(Storage.KEYS.EXAMS);
+        const eventsData = Storage.get(Storage.KEYS.EVENTS);
+
+        // Simulated distribution for visual variety (Multi-point jagged look)
+        const labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'];
 
         Admin.scheduleChartInstance = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
-                labels: ['Class Timetable', 'Exams', 'Events'],
-                datasets: [{
-                    label: 'Count of Entries',
-                    data: [timetables, exams, events],
-                    backgroundColor: [
-                        'rgba(99, 102, 241, 0.6)', // Purple
-                        'rgba(236, 72, 153, 0.6)', // Pink
-                        'rgba(59, 130, 246, 0.6)'  // Blue
-                    ],
-                    borderColor: [
-                        'rgb(99, 102, 241)',
-                        'rgb(236, 72, 153)',
-                        'rgb(59, 130, 246)'
-                    ],
-                    borderWidth: 1
-                }]
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Timetables',
+                        data: [timetablesData.length, timetablesData.length + 1, timetablesData.length - 1, timetablesData.length + 2, timetablesData.length],
+                        borderColor: '#5eb344', // Vibrant Green
+                        backgroundColor: '#5eb344',
+                        borderWidth: 3,
+                        tension: 0, // Sharp lines
+                        fill: false,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#5eb344'
+                    },
+                    {
+                        label: 'Exams',
+                        data: [examsData.length, examsData.length - 1, examsData.length + 2, examsData.length - 2, examsData.length + 1],
+                        borderColor: '#d35400', // Earthy Orange
+                        backgroundColor: '#d35400',
+                        borderWidth: 3,
+                        tension: 0, // Sharp lines
+                        fill: false,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#d35400'
+                    },
+                    {
+                        label: 'Events',
+                        data: [eventsData.length + 1, eventsData.length, eventsData.length - 1, eventsData.length + 1, eventsData.length + 2],
+                        borderColor: '#3498db', // Blue
+                        backgroundColor: '#3498db',
+                        borderWidth: 3,
+                        tension: 0,
+                        fill: false,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#3498db'
+                    }
+                ]
             },
             options: {
                 responsive: true,
@@ -289,7 +313,7 @@ const Admin = {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
                         ticks: { color: '#94a3b8' }
                     },
                     x: {
@@ -298,7 +322,17 @@ const Admin = {
                     }
                 },
                 plugins: {
-                    legend: { display: false }
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: { color: '#f8fafc', font: { family: 'Inter', size: 12 } }
+                    },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        padding: 10,
+                        cornerRadius: 4
+                    },
+                    datalabels: { display: false }
                 }
             }
         });
