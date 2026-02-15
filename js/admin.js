@@ -404,6 +404,13 @@ const Admin = {
         window.print();
     },
 
+    editStudent: (id) => {
+        const student = Storage.get(Storage.KEYS.STUDENTS).find(s => s.id === id);
+        if (student) {
+            Admin.openModal('student', student);
+        }
+    },
+
     editTeacher: (id) => Admin.openModal('teacher', Storage.get(Storage.KEYS.TEACHERS).find(t => t.id === id)),
     editClass: (id) => Admin.openModal('class', Storage.get(Storage.KEYS.CLASSES).find(c => c.id === id)),
     editSubject: (id) => Admin.openModal('subject', Storage.get(Storage.KEYS.SUBJECTS).find(s => s.id === id)),
