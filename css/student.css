@@ -209,3 +209,100 @@
     font-weight: 600;
     margin-top: 1rem;
 }
+
+/* Tab Sub-Nav */
+.tab-sub-nav {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.tab-sub-nav button {
+    padding: 0.5rem 1.25rem;
+    border-radius: 2rem;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.tab-sub-nav button.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-badge.upcoming {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.status-badge.submitted {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.status-badge.late {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.status-badge.graded {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+/* Exam Cards */
+.exams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.exam-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-left: 4px solid #f59e0b;
+}
+
+.exam-card.completed {
+    border-left-color: #10b981;
+}
+
+.exam-date {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.exam-details {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.exam-details i {
+    width: 20px;
+}
+
+/* Grades & Feedback */
+.feedback-box {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-top: 1rem;
+    font-style: italic;
+    font-size: 0.9rem;
+    border-left: 2px solid var(--primary-color);
+}
