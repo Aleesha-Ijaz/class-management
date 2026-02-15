@@ -177,19 +177,67 @@ const Student = {
         document.getElementById('modal-container').style.display = 'none';
     },
 
+    switchAssignmentView: (view) => {
+        const buttons = document.querySelectorAll('.tab-sub-nav button');
+        buttons.forEach(btn => {
+            btn.classList.toggle('active', btn.textContent.toLowerCase().includes(view));
+        });
+
+        document.getElementById('assignment-view-container').style.display = view === 'assignments' ? 'block' : 'none';
+        document.getElementById('exam-view-container').style.display = view === 'exams' ? 'block' : 'none';
+
+        if (view === 'assignments') Student.renderAssignments();
+        if (view === 'exams') Student.renderExamSchedule();
+    },
+
     renderAssignments: () => {
         const assignments = Storage.get(Storage.KEYS.ASSIGNMENTS);
+        const filter = document.getElementById('assignment-status-filter')?.value || 'all';
         const container = document.getElementById('student-assignments-list');
 
-        container.innerHTML = assignments.map(a => `
+        // Mock statuses and feedback for demo
+        const assignmentData = [
+            { id: 1, title: 'Calculus Homework 1', dueDate: 'Feb 18, 2024', status: 'upcoming', grade: null, feedback: null },
+            { id: 2, title: 'Physics Lab Report', dueDate: 'Feb 15, 2024', status: 'submitted', grade: null, feedback: null },
+            { id: 3, title: 'History Essay', dueDate: 'Feb 10, 2024', status: 'graded', grade: 'A', feedback: 'Excellent analysis of the industrial revolution.' },
+            { id: 4, title: 'English Poetry Analysis', dueDate: 'Feb 05, 2024', status: 'late', grade: 'B-', feedback: 'Good work, but submitted 2 days late.' }
+        ];
+
+        const filtered = assignmentData.filter(a => filter === 'all' || a.status === filter);
+
+        container.innerHTML = filtered.map(a => `
             <div class="student-assignment-row card mb-1 animate-slide-up">
                 <div class="assignment-info">
-                    <h3>${a.title}</h3>
-                    <p class="text-muted">${a.dueDate} • Due</p>
+                    <span class="status-badge ${a.status}">${a.status.charAt(0).toUpperCase() + a.status.slice(1)}</span>
+                    <h3 class="mt-1">${a.title}</h3>
+                    <p class="text-muted">${a.dueDate} • ${a.status === 'upcoming' ? 'Deadline' : 'Completed'}</p>
+                    ${a.feedback ? `<div class="feedback-box">"${a.feedback}"</div>` : ''}
                 </div>
                 <div class="assignment-status">
-                    <span class="assignment-badge badge-blue">Pending</span>
-                    <button class="btn btn-sm ml-1"><i class="fas fa-upload"></i> Submit</button>
+                    ${a.grade ? `<strong class="text-primary mr-1">Grade: ${a.grade}</strong>` : ''}
+                    ${a.status === 'upcoming' ? '<button class="btn btn-sm btn-primary"><i class="fas fa-upload mr-1"></i> Submit</button>' : ''}
+                    ${a.status === 'submitted' ? '<span class="text-success"><i class="fas fa-check-double mr-1"></i> Received</span>' : ''}
+                </div>
+            </div>
+        `).join('') || '<p class="text-center text-muted p-2">No assignments found for this filter.</p>';
+    },
+
+    renderExamSchedule: () => {
+        const container = document.getElementById('student-exams-list');
+        const exams = [
+            { subject: 'Mathematics', date: 'March 15, 2024', time: '09:00 AM', venue: 'Main Hall', info: 'Bring your own geometry kit.' },
+            { subject: 'Physics', date: 'March 18, 2024', time: '10:00 AM', venue: 'Lab 2', info: 'Scientific calculators allowed.' },
+            { subject: 'English', date: 'March 22, 2024', time: '01:30 PM', venue: 'Room 101', info: 'Short stories and poetry sections.' }
+        ];
+
+        container.innerHTML = exams.map(e => `
+            <div class="exam-card animate-slide-up">
+                <div class="exam-date">${e.date}</div>
+                <h3>${e.subject}</h3>
+                <div class="exam-details mt-1">
+                    <p><i class="fas fa-clock"></i> ${e.time}</p>
+                    <p><i class="fas fa-map-marker-alt"></i> ${e.venue}</p>
+                    <p class="mt-1"><strong>Note:</strong> ${e.info}</p>
                 </div>
             </div>
         `).join('');
