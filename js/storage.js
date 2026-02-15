@@ -8,6 +8,9 @@ const Storage = {
         ATTENDANCE: 'cms_attendance',
         ASSIGNMENTS: 'cms_assignments',
         GRADES: 'cms_grades',
+        EXAMS: 'cms_exams',
+        TIMETABLES: 'cms_timetables',
+        EVENTS: 'cms_events',
         CURRENT_USER: 'cms_current_user'
     },
 
@@ -95,6 +98,22 @@ const Storage = {
             Storage.save(Storage.KEYS.TEACHERS, [
                 { id: 't1', name: 'Mr. Wilson', email: 'wilson@example.com', subject: 'Mathematics' },
                 { id: 't2', name: 'Ms. Davis', email: 'davis@example.com', subject: 'Science' }
+            ]);
+        }
+
+        // Sample Timetables
+        if (Storage.get(Storage.KEYS.TIMETABLES).length === 0) {
+            Storage.save(Storage.KEYS.TIMETABLES, [
+                { id: 'tt1', class: '10-A', subject: 'Mathematics', day: 'Monday', time: '09:00 AM - 10:00 AM', teacher: 'Mr. Wilson' },
+                { id: 'tt2', class: '10-A', subject: 'Science', day: 'Tuesday', time: '10:00 AM - 11:00 AM', teacher: 'Ms. Davis' }
+            ]);
+        }
+
+        // Sample Events
+        if (Storage.get(Storage.KEYS.EVENTS).length === 0) {
+            Storage.save(Storage.KEYS.EVENTS, [
+                { id: 'e1', name: 'Annual Sports Day', date: '2024-11-20', venue: 'School Ground', description: 'Annual athletic events and competitions.' },
+                { id: 'e2', name: 'Science Exhibition', date: '2024-12-15', venue: 'Main Hall', description: 'Showcase of student science projects.' }
             ]);
         }
     },
