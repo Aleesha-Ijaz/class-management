@@ -411,6 +411,79 @@ td {
     box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4) !important;
 }
 
+/* Custom Delete Confirmation Card */
+.modal-confirm {
+    max-width: 400px !important;
+    text-align: center;
+    padding: 2rem !important;
+    background: #0f172a !important;
+    border: 1px solid #1e293b !important;
+    border-radius: 1.5rem !important;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.1), 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.modal-confirm .icon-box {
+    width: 64px;
+    height: 64px;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 1.5rem;
+    animation: pulse-danger 2s infinite;
+}
+
+@keyframes pulse-danger {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+.modal-confirm h2 {
+    color: #f8fafc;
+    margin-bottom: 0.5rem;
+}
+
+.modal-confirm p {
+    color: #94a3b8;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-danger {
+    background: #ef4444 !important;
+    color: white !important;
+    flex: 1;
+}
+
+.btn-secondary {
+    background: #334155 !important;
+    color: #f1f5f9 !important;
+    flex: 1;
+}
+
+.btn-danger:hover,
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
 .modal-dark .btn-close {
     color: #94a3b8 !important;
     background: #1e293b !important;
