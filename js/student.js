@@ -34,12 +34,12 @@ const Student = {
                 if (target === 'classes') Student.renderEnrolledClasses();
                 if (target === 'assignments') Student.renderAssignments();
                 if (target === 'grades') Student.renderGrades();
+                if (target === 'profile') Student.renderProfile();
             });
         });
     },
 
     loadDashboardData: () => {
-        // Mock data for demo
         Student.renderSchedule();
         Student.renderRecentGrades();
     },
@@ -65,8 +65,6 @@ const Student = {
     renderEnrolledClasses: () => {
         const classes = Storage.get(Storage.KEYS.CLASSES);
         const container = document.getElementById('enrolled-classes-list');
-
-        // Mock additional data for demo (Progress, Materials, etc.)
         const courseDetails = {
             'Mathematics': { progress: 75, nextClass: 'Tomorrow, 09:00 AM', instructor: 'Mr. Wilson' },
             'Science': { progress: 45, nextClass: 'Tuesday, 10:00 AM', instructor: 'Ms. Davis' },
@@ -83,7 +81,6 @@ const Student = {
                     </div>
                     <h3>${c.name}</h3>
                     <p class="text-muted">Section: ${c.section}</p>
-                    
                     <div class="progress-container">
                         <div class="progress-header">
                             <span>Course Progress</span>
@@ -93,12 +90,10 @@ const Student = {
                             <div class="progress-fill" style="width: ${detail.progress}%"></div>
                         </div>
                     </div>
-
                     <div class="next-class-badge">
                         <i class="fas fa-clock"></i>
                         Next: ${detail.nextClass}
                     </div>
-
                     <div class="mt-1">
                         <button class="btn btn-sm btn-primary btn-block" onclick="Student.viewCourseDetails('${c.id}')">
                             <i class="fas fa-external-link-alt mr-1"></i> View Details
@@ -115,8 +110,6 @@ const Student = {
         if (!course) return;
 
         const container = document.getElementById('modal-container');
-
-        // Mock data for modal
         const mockMaterials = [
             { name: 'Lecture Notes - Week 1-4', type: 'notes', icon: 'fa-file-alt' },
             { name: 'Intro Video Workshop', type: 'video', icon: 'fa-play-circle' },
@@ -138,12 +131,8 @@ const Student = {
                         <div class="instructor-info">
                             <h4>${course.teacher || 'N/A'}</h4>
                             <p>Senior Faculty Member • Professional Educator</p>
-                            <div class="mt-1">
-                                <button class="btn btn-sm btn-secondary"><i class="fas fa-envelope mr-1"></i> Contact</button>
-                            </div>
                         </div>
                     </div>
-
                     <div class="section-title mt-2">
                         <i class="fas fa-folder-open mr-1"></i> Course Materials
                     </div>
@@ -154,18 +143,6 @@ const Student = {
                                 <span>${m.name}</span>
                             </div>
                         `).join('')}
-                    </div>
-
-                    <div class="section-title mt-2">
-                        <i class="fas fa-calendar-alt mr-1"></i> Upcoming Classes
-                    </div>
-                    <div class="card mt-1 p-1">
-                        <div class="timeline-item pb-1">
-                            <p><strong>Tuesday, Feb 17</strong> • 10:00 AM - 11:30 AM</p>
-                        </div>
-                        <div class="timeline-item">
-                            <p><strong>Thursday, Feb 19</strong> • 01:00 PM - 02:30 PM</p>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -179,90 +156,119 @@ const Student = {
 
     switchAssignmentView: (view) => {
         const buttons = document.querySelectorAll('.tab-sub-nav button');
-        buttons.forEach(btn => {
-            btn.classList.toggle('active', btn.textContent.toLowerCase().includes(view));
-        });
-
+        buttons.forEach(btn => btn.classList.toggle('active', btn.textContent.toLowerCase().includes(view)));
         document.getElementById('assignment-view-container').style.display = view === 'assignments' ? 'block' : 'none';
         document.getElementById('exam-view-container').style.display = view === 'exams' ? 'block' : 'none';
-
         if (view === 'assignments') Student.renderAssignments();
         if (view === 'exams') Student.renderExamSchedule();
     },
 
     renderAssignments: () => {
-        const assignments = Storage.get(Storage.KEYS.ASSIGNMENTS);
         const filter = document.getElementById('assignment-status-filter')?.value || 'all';
         const container = document.getElementById('student-assignments-list');
-
-        // Mock statuses and feedback for demo
         const assignmentData = [
             { id: 1, title: 'Calculus Homework 1', dueDate: 'Feb 18, 2024', status: 'upcoming', grade: null, feedback: null },
             { id: 2, title: 'Physics Lab Report', dueDate: 'Feb 15, 2024', status: 'submitted', grade: null, feedback: null },
-            { id: 3, title: 'History Essay', dueDate: 'Feb 10, 2024', status: 'graded', grade: 'A', feedback: 'Excellent analysis of the industrial revolution.' },
-            { id: 4, title: 'English Poetry Analysis', dueDate: 'Feb 05, 2024', status: 'late', grade: 'B-', feedback: 'Good work, but submitted 2 days late.' }
+            { id: 3, title: 'History Essay', dueDate: 'Feb 10, 2024', status: 'graded', grade: 'A', feedback: 'Excellent analysis.' },
+            { id: 4, title: 'English Poetry Analysis', dueDate: 'Feb 05, 2024', status: 'late', grade: 'B-', feedback: 'Submitted late.' }
         ];
 
         const filtered = assignmentData.filter(a => filter === 'all' || a.status === filter);
-
         container.innerHTML = filtered.map(a => `
             <div class="student-assignment-row card mb-1 animate-slide-up">
                 <div class="assignment-info">
-                    <span class="status-badge ${a.status}">${a.status.charAt(0).toUpperCase() + a.status.slice(1)}</span>
+                    <span class="status-badge ${a.status}">${a.status}</span>
                     <h3 class="mt-1">${a.title}</h3>
-                    <p class="text-muted">${a.dueDate} • ${a.status === 'upcoming' ? 'Deadline' : 'Completed'}</p>
+                    <p class="text-muted">${a.dueDate}</p>
                     ${a.feedback ? `<div class="feedback-box">"${a.feedback}"</div>` : ''}
                 </div>
                 <div class="assignment-status">
                     ${a.grade ? `<strong class="text-primary mr-1">Grade: ${a.grade}</strong>` : ''}
-                    ${a.status === 'upcoming' ? '<button class="btn btn-sm btn-primary"><i class="fas fa-upload mr-1"></i> Submit</button>' : ''}
-                    ${a.status === 'submitted' ? '<span class="text-success"><i class="fas fa-check-double mr-1"></i> Received</span>' : ''}
                 </div>
             </div>
-        `).join('') || '<p class="text-center text-muted p-2">No assignments found for this filter.</p>';
+        `).join('') || '<p>No assignments found.</p>';
     },
 
     renderExamSchedule: () => {
         const container = document.getElementById('student-exams-list');
         const exams = [
-            { subject: 'Mathematics', date: 'March 15, 2024', time: '09:00 AM', venue: 'Main Hall', info: 'Bring your own geometry kit.' },
-            { subject: 'Physics', date: 'March 18, 2024', time: '10:00 AM', venue: 'Lab 2', info: 'Scientific calculators allowed.' },
-            { subject: 'English', date: 'March 22, 2024', time: '01:30 PM', venue: 'Room 101', info: 'Short stories and poetry sections.' }
+            { subject: 'Mathematics', date: 'March 15, 2024', time: '09:00 AM', venue: 'Main Hall' },
+            { subject: 'Physics', date: 'March 18, 2024', time: '10:00 AM', venue: 'Lab 2' }
         ];
-
         container.innerHTML = exams.map(e => `
             <div class="exam-card animate-slide-up">
                 <div class="exam-date">${e.date}</div>
                 <h3>${e.subject}</h3>
-                <div class="exam-details mt-1">
-                    <p><i class="fas fa-clock"></i> ${e.time}</p>
-                    <p><i class="fas fa-map-marker-alt"></i> ${e.venue}</p>
-                    <p class="mt-1"><strong>Note:</strong> ${e.info}</p>
-                </div>
+                <p><i class="fas fa-clock"></i> ${e.time} | <i class="fas fa-map-marker-alt"></i> ${e.venue}</p>
             </div>
         `).join('');
     },
 
     renderRecentGrades: () => {
         const container = document.getElementById('recent-grades');
-        const grades = [
-            { subject: 'Math Quiz', score: '95/100', grade: 'A+' },
-            { subject: 'Physics Lab', score: '82/100', grade: 'B' }
-        ];
-
-        container.innerHTML = grades.map(g => `
-            <div class="student-assignment-row">
-                <span>${g.subject}</span>
-                <strong>${g.score} (${g.grade})</strong>
-            </div>
-        `).join('');
+        const grades = [{ subject: 'Math Quiz', score: '95/100' }, { subject: 'Physics Lab', score: '82/100' }];
+        container.innerHTML = grades.map(g => `<div class="student-assignment-row"><span>${g.subject}</span><strong>${g.score}</strong></div>`).join('');
     },
 
     renderGrades: () => {
-        const container = document.getElementById('student-grades-list');
-        // Similar to recent grades but more detailed
-        container.innerHTML = `<h3>Full Academic Record</h3><p class="text-muted mt-1">Detailed grades will appear here.</p>`;
-    }
+        const container = document.getElementById('student-grades-table-body');
+        const grades = [
+            { subject: 'Mathematics', score: 92, grade: 'A' },
+            { subject: 'Science', score: 88, grade: 'A-' }
+        ];
+        container.innerHTML = grades.map(g => `<tr><td>${g.subject}</td><td>${g.score}/100</td><td>${g.grade}</td></tr>`).join('');
+        Student.initAttendanceChart();
+        Student.initProgressChart();
+    },
+
+    initAttendanceChart: () => {
+        const ctx = document.getElementById('attendanceDoughnut')?.getContext('2d');
+        if (!ctx) return;
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: { datasets: [{ data: [92, 8], backgroundColor: ['#6366f1', 'rgba(255,255,255,0.1)'], borderWidth: 0 }] },
+            options: { cutout: '80%', plugins: { legend: { display: false } } }
+        });
+    },
+
+    initProgressChart: () => {
+        const ctx = document.getElementById('gradeProgressChart')?.getContext('2d');
+        if (!ctx) return;
+        new Chart(ctx, {
+            type: 'line',
+            data: { labels: ['Sem 1', 'Sem 2', 'Sem 3'], datasets: [{ data: [3.4, 3.6, 3.85], borderColor: '#6366f1', tension: 0.4 }] },
+            options: { plugins: { legend: { display: false } } }
+        });
+    },
+
+    renderProfile: () => {
+        const user = Storage.getCurrentUser();
+        if (!user) return;
+        document.getElementById('profile-name').value = user.name;
+        document.getElementById('profile-email').value = user.email || 'student@example.com';
+        document.getElementById('profile-phone').value = user.phone || '+1 234 567 890';
+    },
+
+    updateProfile: () => {
+        const name = document.getElementById('profile-name').value;
+        const email = document.getElementById('profile-email').value;
+        const phone = document.getElementById('profile-phone').value;
+        const user = Storage.getCurrentUser();
+        user.name = name;
+        user.email = email;
+        user.phone = phone;
+        Storage.setCurrentUser(user);
+        document.getElementById('student-name').textContent = name;
+        document.getElementById('welcome-name').textContent = name.split(' ')[0];
+        alert('Profile updated successfully!');
+    },
+
+    changePassword: () => {
+        alert('Password updated successfully!');
+        document.getElementById('password-form').reset();
+    },
+
+    saveSettings: () => { console.log('Settings saved'); }
 };
 
 document.addEventListener('DOMContentLoaded', Student.init);
