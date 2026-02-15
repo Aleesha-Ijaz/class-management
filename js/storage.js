@@ -116,6 +116,16 @@ const Storage = {
                 { id: 'e2', name: 'Science Exhibition', date: '2024-12-15', venue: 'Main Hall', description: 'Showcase of student science projects.' }
             ]);
         }
+
+        // Sample Classes
+        if (Storage.get(Storage.KEYS.CLASSES).length === 0) {
+            Storage.save(Storage.KEYS.CLASSES, [
+                { id: 'c1', name: 'Mathematics', section: '10-A', teacher: 'Mr. Wilson' },
+                { id: 'c2', name: 'Science', section: '10-A', teacher: 'Ms. Davis' },
+                { id: 'c3', name: 'English', section: '10-A', teacher: 'Mrs. Thompson' },
+                { id: 'c4', name: 'History', section: '10-A', teacher: 'Mr. Roberts' }
+            ]);
+        }
     },
 
     // Current User Session
