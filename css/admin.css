@@ -508,3 +508,37 @@ td {
 .mt-2 {
     margin-top: 2rem;
 }
+
+/* Chart Container Styles */
+.chart-container {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    height: 350px;
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.mb-2 {
+    margin-bottom: 2rem;
+}
+
+.auth-form textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: white;
+    font-family: inherit;
+    min-height: 100px;
+    resize: vertical;
+}
+
+.auth-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
