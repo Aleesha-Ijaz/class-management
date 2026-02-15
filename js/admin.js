@@ -417,19 +417,44 @@ const Admin = {
     editClass: (id) => Admin.openModal('class', Storage.get(Storage.KEYS.CLASSES).find(c => c.id === id)),
     editSubject: (id) => Admin.openModal('subject', Storage.get(Storage.KEYS.SUBJECTS).find(s => s.id === id)),
 
+    deleteStudent: (id) => Admin.showDeleteConfirmation(id, 'Student', () => {
+        Admin.deleteEntity(Storage.KEYS.STUDENTS, id, 'Student');
+    }),
+
     deleteTeacher: (id) => Admin.deleteEntity(Storage.KEYS.TEACHERS, id, 'Teacher'),
     deleteClass: (id) => Admin.deleteEntity(Storage.KEYS.CLASSES, id, 'Class'),
     deleteSubject: (id) => Admin.deleteEntity(Storage.KEYS.SUBJECTS, id, 'Subject'),
 
     deleteEntity: (key, id, label) => {
-        if (confirm(`Are you sure you want to delete this ${label.toLowerCase()}?`)) {
-            Storage.delete(key, id);
-            Utils.showToast(`${label} deleted successfully`, 'success');
-            const type = label.toLowerCase();
-            Admin[`render${type.charAt(0).toUpperCase() + type.slice(1)}s`]();
-            Admin.loadStats();
-            if (label === 'Student') Admin.populateStudentFilters();
-        }
+        Storage.delete(key, id);
+        Utils.showToast(`${label} deleted successfully`, 'success');
+        const type = label.toLowerCase();
+        Admin[`render${type.charAt(0).toUpperCase() + type.slice(1)}s`]();
+        Admin.loadStats();
+        if (label === 'Student') Admin.populateStudentFilters();
+    },
+
+    showDeleteConfirmation: (id, label, onConfirm) => {
+        const container = document.getElementById('modal-container');
+        container.innerHTML = `
+            <div class="modal modal-confirm animate-slide-up">
+                <div class="icon-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h2>Are you sure?</h2>
+                <p>Do you really want to delete this ${label.toLowerCase()}? This action cannot be undone.</p>
+                <div class="confirm-actions">
+                    <button class="btn btn-secondary" onclick="Admin.closeModal()">No, Cancel</button>
+                    <button class="btn btn-danger" id="confirmDeleteBtn">Yes, Delete</button>
+                </div>
+            </div>
+        `;
+        container.style.display = 'flex';
+
+        document.getElementById('confirmDeleteBtn').onclick = () => {
+            onConfirm();
+            Admin.closeModal();
+        };
     },
 
     populateStudentFilters: () => {
