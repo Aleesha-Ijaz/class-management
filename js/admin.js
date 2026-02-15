@@ -218,33 +218,33 @@ const Admin = {
     },
 
     getStudentModalHtml: (data) => `
-        <div class="modal">
+        <div class="modal modal-dark animate-slide-up">
             <div class="modal-header">
                 <h2>${data ? 'Edit' : 'Add'} Student</h2>
                 <button class="btn-close" onclick="Admin.closeModal()">&times;</button>
             </div>
             <form id="studentForm" class="auth-form">
                 <input type="hidden" id="entity-id" value="${data ? data.id : ''}">
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="name" value="${data ? data.name : ''}" required>
+                <div class="form-group mb-1">
+                    <label><i class="fas fa-user mr-1"></i> Full Name</label>
+                    <input type="text" id="name" value="${data ? data.name : ''}" placeholder="Enter full name" required>
                 </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="email" value="${data ? data.email : ''}" required>
+                <div class="form-group mb-1">
+                    <label><i class="fas fa-envelope mr-1"></i> Email Address</label>
+                    <input type="email" id="email" value="${data ? data.email : ''}" placeholder="example@cms.com" required>
                 </div>
-                <div class="grid-2">
+                <div class="grid-2 mb-1">
                     <div class="form-group">
-                        <label>Class</label>
-                        <input type="text" id="class" value="${data ? data.class : ''}" required>
+                        <label><i class="fas fa-school mr-1"></i> Class</label>
+                        <input type="text" id="class" value="${data ? data.class : ''}" placeholder="e.g. 10th-A" required>
                     </div>
                     <div class="form-group">
-                        <label>Roll No</label>
-                        <input type="text" id="roll" value="${data ? data.roll : ''}" required>
+                        <label><i class="fas fa-hashtag mr-1"></i> Roll Number</label>
+                        <input type="text" id="roll" value="${data ? data.roll : ''}" placeholder="e.g. 101" required>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Fee Status</label>
+                <div class="form-group mb-2">
+                    <label><i class="fas fa-credit-card mr-1"></i> Fee Status</label>
                     <select id="feeStatus" required>
                         <option value="Paid" ${data && data.feeStatus === 'Paid' ? 'selected' : ''}>Paid</option>
                         <option value="Pending" ${data && data.feeStatus === 'Pending' ? 'selected' : ''}>Pending</option>
@@ -254,7 +254,9 @@ const Admin = {
                 <input type="hidden" id="attendance" value="${data ? (data.attendance || '0%') : '0%'}">
                 <input type="hidden" id="performance" value="${data ? (data.performance || 'N/A') : 'N/A'}">
                 
-                <button type="submit" class="btn btn-primary btn-block">Save Student</button>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-save mr-1"></i> Save Changes
+                </button>
             </form>
         </div>
     `,
