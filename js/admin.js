@@ -153,13 +153,18 @@ const Admin = {
         tbody.innerHTML = classes.map(c => `
             <tr>
                 <td>${c.name}</td>
-                <td>${c.section}</td>
-                <td>${c.teacher || 'Unassigned'}</td>
+                <td><span class="badge badge-info">${c.section}</span></td>
+                <td><span class="badge badge-purple">${c.teacher || 'Unassigned'}</span></td>
+                <td>${c.duration || 'N/A'}</td>
+                <td>${c.schedule || 'N/A'}</td>
+                <td>
+                    ${c.materials ? `<a href="${c.materials}" target="_blank" class="btn-icon btn-blue" title="View Materials"><i class="fas fa-file-alt"></i></a>` : 'No Materials'}
+                </td>
                 <td class="actions">
-                    <button class="btn-icon btn-edit" onclick="Admin.editClass('${c.id}')">
+                    <button class="btn-icon btn-edit" title="Edit Course" onclick="Admin.editClass('${c.id}')">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn-icon btn-delete" onclick="Admin.deleteClass('${c.id}')">
+                    <button class="btn-icon btn-delete" title="Delete Course" onclick="Admin.deleteClass('${c.id}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -179,10 +184,10 @@ const Admin = {
                 <td>${s.code}</td>
                 <td>${s.teacher || 'Unassigned'}</td>
                 <td class="actions">
-                    <button class="btn-icon btn-edit" onclick="Admin.editSubject('${s.id}')">
+                    <button class="btn-icon btn-edit" title="Edit Subject" onclick="Admin.editSubject('${s.id}')">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn-icon btn-delete" onclick="Admin.deleteSubject('${s.id}')">
+                    <button class="btn-icon btn-delete" title="Delete Subject" onclick="Admin.deleteSubject('${s.id}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -295,30 +300,59 @@ const Admin = {
         </div>
     `,
 
-    getClassModalHtml: (data) => `
-        <div class="modal">
-            <div class="modal-header">
-                <h2>${data ? 'Edit' : 'Add'} Class</h2>
-                <button class="btn-close" onclick="Admin.closeModal()">&times;</button>
+    getClassModalHtml: (data) => {
+        const teachers = Storage.get(Storage.KEYS.TEACHERS);
+
+        return `
+            <div class="modal modal-dark animate-slide-up">
+                <div class="modal-header">
+                    <h2>${data ? 'Edit' : 'Add'} Course/Class</h2>
+                    <button class="btn-close" onclick="Admin.closeModal()">&times;</button>
+                </div>
+                <form id="classForm" class="auth-form">
+                    <input type="hidden" id="entity-id" value="${data ? data.id : ''}">
+                    <div class="grid-2 mb-1">
+                        <div class="form-group">
+                            <label><i class="fas fa-book mr-1"></i> Course Name</label>
+                            <input type="text" id="name" value="${data ? data.name : ''}" placeholder="e.g. Web Development" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-layer-group mr-1"></i> Section</label>
+                            <input type="text" id="section" value="${data ? data.section : ''}" placeholder="e.g. Batch A" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mb-1">
+                        <label><i class="fas fa-user-tie mr-1"></i> Assign Teacher</label>
+                        <select id="teacher" required>
+                            <option value="">Select a Teacher</option>
+                            ${teachers.map(t => `<option value="${t.name}" ${data && data.teacher === t.name ? 'selected' : ''}>${t.name}</option>`).join('')}
+                        </select>
+                    </div>
+
+                    <div class="grid-2 mb-1">
+                        <div class="form-group">
+                            <label><i class="fas fa-clock mr-1"></i> Duration</label>
+                            <input type="text" id="duration" value="${data ? (data.duration || '') : ''}" placeholder="e.g. 3 Months">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-alt mr-1"></i> Schedule</label>
+                            <input type="text" id="schedule" value="${data ? (data.schedule || '') : ''}" placeholder="e.g. Mon-Fri 10AM">
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label><i class="fas fa-link mr-1"></i> Course Materials URL</label>
+                        <input type="url" id="materials" value="${data ? (data.materials || '') : ''}" placeholder="https://drive.google.com/...">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-save mr-1"></i> Save Course Changes
+                    </button>
+                </form>
             </div>
-            <form id="classForm" class="auth-form">
-                <input type="hidden" id="entity-id" value="${data ? data.id : ''}">
-                <div class="form-group">
-                    <label>Class Name</label>
-                    <input type="text" id="name" value="${data ? data.name : ''}" required>
-                </div>
-                <div class="form-group">
-                    <label>Section</label>
-                    <input type="text" id="section" value="${data ? data.section : ''}" required>
-                </div>
-                <div class="form-group">
-                    <label>Class Teacher</label>
-                    <input type="text" id="teacher" value="${data ? data.teacher : ''}" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Save Class</button>
-            </form>
-        </div>
-    `,
+        `;
+    },
 
     getSubjectModalHtml: (data) => `
         <div class="modal">
@@ -431,8 +465,12 @@ const Admin = {
     }),
 
     deleteTeacher: (id) => Admin.deleteEntity(Storage.KEYS.TEACHERS, id, 'Teacher'),
-    deleteClass: (id) => Admin.deleteEntity(Storage.KEYS.CLASSES, id, 'Class'),
-    deleteSubject: (id) => Admin.deleteEntity(Storage.KEYS.SUBJECTS, id, 'Subject'),
+    deleteClass: (id) => Admin.showDeleteConfirmation(id, 'Class', () => {
+        Admin.deleteEntity(Storage.KEYS.CLASSES, id, 'Class');
+    }),
+    deleteSubject: (id) => Admin.showDeleteConfirmation(id, 'Subject', () => {
+        Admin.deleteEntity(Storage.KEYS.SUBJECTS, id, 'Subject');
+    }),
 
     deleteEntity: (key, id, label) => {
         Storage.delete(key, id);
