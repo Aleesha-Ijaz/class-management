@@ -1,4 +1,6 @@
 const Student = {
+    currentDate: new Date(),
+
     init: () => {
         Student.checkAuth();
         Student.setupTabNavigation();
@@ -32,6 +34,7 @@ const Student = {
                 });
 
                 if (target === 'classes') Student.renderEnrolledClasses();
+                if (target === 'calendar') Student.renderCalendar();
                 if (target === 'assignments') Student.renderAssignments();
                 if (target === 'grades') Student.renderGrades();
                 if (target === 'profile') Student.renderProfile();
@@ -42,6 +45,85 @@ const Student = {
     loadDashboardData: () => {
         Student.renderSchedule();
         Student.renderRecentGrades();
+    },
+
+    // Calendar Methods
+    changeMonth: (offset) => {
+        Student.currentDate.setMonth(Student.currentDate.getMonth() + offset);
+        Student.renderCalendar();
+    },
+
+    renderCalendar: () => {
+        const grid = document.getElementById('calendar-grid');
+        const monthYear = document.getElementById('calendar-month-year');
+        if (!grid || !monthYear) return;
+
+        const year = Student.currentDate.getFullYear();
+        const month = Student.currentDate.getMonth();
+
+        monthYear.textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(Student.currentDate);
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+
+        grid.innerHTML = '';
+
+        // Empty slots for previous month
+        for (let i = 0; i < firstDay; i++) {
+            grid.innerHTML += '<div class="calendar-day empty"></div>';
+        }
+
+        // Days of current month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
+            const events = Student.getEventsForDate(day, month, year);
+
+            grid.innerHTML += `
+                <div class="calendar-day ${isToday ? 'today' : ''}">
+                    <span class="day-number">${day}</span>
+                    <div class="day-events">
+                        ${events.map(e => `<div class="event-pill ${e.type}" title="${e.title}">${e.title}</div>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+    },
+
+    getEventsForDate: (day, month, year) => {
+        // Mock data logic based on the requirements
+        const events = [];
+
+        // Static Mock Data for demonstration
+        const mockSchedule = [
+            { day: 1, type: 'holiday', title: 'New Semester Break' },
+            { day: 5, type: 'exam', title: 'Math Mid-term' },
+            { day: 10, type: 'assignment', title: 'Physics Lab Report' },
+            { day: 15, type: 'class', title: 'Computer Science Extra' },
+            { day: 20, type: 'holiday', title: 'Founders Day' },
+            { day: 25, type: 'assignment', title: 'English Essay' }
+        ];
+
+        // In a real app, we'd filter from Storage.get(Storage.KEYS.CLASSES), etc.
+        // For now, we'll use a mix of fixed logic and mock data
+
+        // Add repeating classes for Mon/Wed/Fri
+        const date = new Date(year, month, day);
+        const dayOfWeek = date.getDay();
+        if (dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 5) { // Mon, Wed, Fri
+            events.push({ type: 'class', title: 'Mathematics' });
+        }
+        if (dayOfWeek === 2 || dayOfWeek === 4) { // Tue, Thu
+            events.push({ type: 'class', title: 'Physics' });
+        }
+
+        // Add from mock data
+        mockSchedule.forEach(m => {
+            if (m.day === day) events.push(m);
+        });
+
+        return events;
     },
 
     renderSchedule: () => {
@@ -272,3 +354,4 @@ const Student = {
 };
 
 document.addEventListener('DOMContentLoaded', Student.init);
+
