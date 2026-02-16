@@ -76,35 +76,38 @@
                 <!-- Overview Tab -->
                 <section id="overview-tab" class="tab-content active">
                     <div class="welcome-banner glass animate-fade-in">
-                        <div class="welcome-text">
-                            <h1>Hello, <span id="welcome-name">Student</span>! 👋</h1>
-                            <p>You have 3 assignments due this week. Stay on track!</p>
-                        </div>
-                        <div class="welcome-image">
-                            <!-- Could be an illustration -->
+                        <div class="welcome-content">
+                            <div class="welcome-profile-pic">
+                                <img src="https://ui-avatars.com/api/?name=Student&background=ec4899&color=fff"
+                                    id="banner-profile-img" alt="Student">
+                            </div>
+                            <div class="welcome-text">
+                                <h1>Hello, <span id="welcome-name">Student</span>! 👋</h1>
+                                <p>You have 3 assignments due this week. Stay on track!</p>
+                            </div>
                         </div>
                     </div>
 
                     <div class="stats-grid mt-2">
                         <div class="stat-card animate-slide-up">
-                            <div class="stat-icon purple"><i class="fas fa-book"></i></div>
+                            <div class="stat-icon purple"><i class="fas fa-award"></i></div>
                             <div class="stat-info">
-                                <h3 id="stat-courses">4</h3>
-                                <p>Courses Enrolled</p>
+                                <h3 id="stat-gpa">3.85</h3>
+                                <p>Current GPA</p>
                             </div>
                         </div>
                         <div class="stat-card animate-slide-up" style="animation-delay: 0.1s">
-                            <div class="stat-icon success-bg"><i class="fas fa-check-circle"></i></div>
+                            <div class="stat-icon success-bg"><i class="fas fa-user-check"></i></div>
                             <div class="stat-info">
                                 <h3 id="stat-attendance-perc">92%</h3>
                                 <p>Attendance</p>
                             </div>
                         </div>
                         <div class="stat-card animate-slide-up" style="animation-delay: 0.2s">
-                            <div class="stat-icon orange"><i class="fas fa-feather-alt"></i></div>
+                            <div class="stat-icon orange"><i class="fas fa-check-double"></i></div>
                             <div class="stat-info">
-                                <h3 id="stat-avg-grade">A-</h3>
-                                <p>Overall Grade</p>
+                                <h3 id="stat-completed-courses">12</h3>
+                                <p>Courses Completed</p>
                             </div>
                         </div>
                     </div>
@@ -112,20 +115,20 @@
                     <div class="grid-2 mt-2">
                         <div class="card">
                             <div class="card-header">
-                                <h2>Today's Schedule</h2>
+                                <h2><i class="fas fa-bullhorn text-primary mr-1"></i> Announcements</h2>
                             </div>
-                            <div class="timeline" id="today-schedule">
+                            <div class="announcements-list" id="dashboard-announcements">
                                 <!-- Dynamic content -->
-                                <p class="text-muted">No classes today.</p>
+                                <p class="text-muted">Loading announcements...</p>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-header">
-                                <h2>Recent Grades</h2>
+                                <h2><i class="fas fa-calendar-day text-primary mr-1"></i> Today's Schedule</h2>
                             </div>
-                            <div class="grades-list" id="recent-grades">
+                            <div class="timeline" id="today-schedule">
                                 <!-- Dynamic content -->
-                                <p class="text-muted">No grades posted yet.</p>
+                                <p class="text-muted">No classes today.</p>
                             </div>
                         </div>
                     </div>
