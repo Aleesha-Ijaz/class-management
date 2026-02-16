@@ -33,8 +33,8 @@
                     <li data-tab="classes">
                         <i class="fas fa-book-reader"></i> My Classes
                     </li>
-                    <li data-tab="attendance">
-                        <i class="fas fa-user-check"></i> My Attendance
+                    <li data-tab="calendar">
+                        <i class="fas fa-calendar-alt"></i> Academic Calendar
                     </li>
                     <li data-tab="assignments">
                         <i class="fas fa-tasks"></i> Assignments
@@ -141,14 +141,29 @@
                     </div>
                 </section>
 
-                <!-- Attendance Tab -->
-                <section id="attendance-tab" class="tab-content">
-                    <div class="section-header">
-                        <h2>My Attendance Records</h2>
-                    </div>
-                    <div class="card p-0">
-                        <div class="attendance-history" id="attendance-history-list">
-                            <!-- Table or Calendar view -->
+                <!-- Calendar Tab -->
+                <section id="calendar-tab" class="tab-content">
+                    <div class="calendar-wrapper card">
+                        <div class="calendar-header-ui">
+                            <div class="calendar-nav">
+                                <button onclick="Student.changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                                <h2 id="calendar-month-year">Month Year</h2>
+                                <button onclick="Student.changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                            <div class="calendar-legend">
+                                <span class="legend-item"><i class="dot class"></i> Class</span>
+                                <span class="legend-item"><i class="dot exam"></i> Exam</span>
+                                <span class="legend-item"><i class="dot assignment"></i> Assignment</span>
+                                <span class="legend-item"><i class="dot holiday"></i> Holiday</span>
+                            </div>
+                        </div>
+                        <div class="calendar-grid-container">
+                            <div class="calendar-days-header">
+                                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                            </div>
+                            <div id="calendar-grid" class="calendar-grid">
+                                <!-- Calendar days injected by JS -->
+                            </div>
                         </div>
                     </div>
                 </section>
