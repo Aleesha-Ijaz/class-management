@@ -43,8 +43,49 @@ const Student = {
     },
 
     loadDashboardData: () => {
+        Student.renderBannerProfile();
+        Student.renderStats();
         Student.renderSchedule();
-        Student.renderRecentGrades();
+        Student.renderAnnouncements();
+    },
+
+    renderBannerProfile: () => {
+        const user = Storage.getCurrentUser();
+        if (!user) return;
+        const bannerImg = document.getElementById('banner-profile-img');
+        if (bannerImg) {
+            bannerImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=ec4899&color=fff&size=128`;
+        }
+    },
+
+    renderStats: () => {
+        // Mock stats calculation
+        document.getElementById('stat-gpa').textContent = '3.85';
+        document.getElementById('stat-attendance-perc').textContent = '92%';
+        document.getElementById('stat-completed-courses').textContent = '12';
+    },
+
+    renderAnnouncements: () => {
+        const container = document.getElementById('dashboard-announcements');
+        if (!container) return;
+
+        const announcements = [
+            { id: 1, title: 'Final Exam Schedule Posted', date: '2 hours ago', type: 'urgent', icon: 'fa-exclamation-circle' },
+            { id: 2, title: 'New Course Materials: Physics Lab', date: 'Yesterday', type: 'info', icon: 'fa-file-alt' },
+            { id: 3, title: 'Spring Fest Registration Open', date: '2 days ago', type: 'event', icon: 'fa-calendar-star' }
+        ];
+
+        container.innerHTML = announcements.map(a => `
+            <div class="announcement-item animate-slide-up">
+                <div class="announcement-icon ${a.type}">
+                    <i class="fas ${a.icon}"></i>
+                </div>
+                <div class="announcement-info">
+                    <h4>${a.title}</h4>
+                    <p>${a.date}</p>
+                </div>
+            </div>
+        `).join('');
     },
 
     // Calendar Methods
