@@ -196,6 +196,43 @@
                         </table>
                     </div>
                 </section>
+
+                <!-- My Classes Tab -->
+                <section id="my-classes-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2>My Classes</h2>
+                        <button class="btn btn-primary" onclick="Teacher.openClassModal()">
+                            <i class="fas fa-plus"></i> Add Class
+                        </button>
+                    </div>
+
+                    <div id="classes-grid" class="classes-grid">
+                        <!-- Dynamic Class Cards -->
+                    </div>
+
+                    <!-- Hidden container for class students view -->
+                    <div id="class-students-view" style="display: none;" class="mt-2">
+                        <div class="section-header">
+                            <h3 id="viewing-class-title">Class Students</h3>
+                            <button class="btn btn-secondary" onclick="Teacher.closeStudentView()">
+                                <i class="fas fa-arrow-left"></i> Back to Classes
+                            </button>
+                        </div>
+                        <div class="card table-container">
+                            <table id="class-students-table">
+                                <thead>
+                                    <tr>
+                                        <th>Roll No</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Parent Contact</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
             </div>
         </main>
     </div>
