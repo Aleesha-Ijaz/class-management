@@ -4,6 +4,7 @@ const Teacher = {
         Teacher.setupTabNavigation();
         Teacher.loadOverviewStats();
         Teacher.populateClassSelects();
+        Teacher.loadMyClasses(); // Initial load
     },
 
     checkAuth: () => {
@@ -33,6 +34,7 @@ const Teacher = {
 
                 if (target === 'assignments') Teacher.renderAssignments();
                 if (target === 'overview') Teacher.loadOverviewStats();
+                if (target === 'my-classes') Teacher.loadMyClasses();
             });
         });
     },
@@ -57,6 +59,139 @@ const Teacher = {
                 classes.map(c => `<option value="${c.name}">${c.name} - ${c.section}</option>`).join('');
         });
     },
+
+    // My Classes
+    loadMyClasses: () => {
+        const classes = Storage.get(Storage.KEYS.CLASSES);
+        const container = document.getElementById('classes-grid');
+        if (!container) return; // Guard clause
+
+        // Ensure we are in list view
+        document.getElementById('classes-grid').style.display = 'grid';
+        document.getElementById('class-students-view').style.display = 'none';
+
+        container.innerHTML = classes.map(c => {
+            const studentCount = Storage.get(Storage.KEYS.STUDENTS).filter(s => s.class === c.name).length;
+            return `
+            <div class="class-card animate-slide-up">
+                <div class="class-header">
+                    <h3>${c.name} <span class="badge-section">${c.section}</span></h3>
+                    <div class="actions">
+                        <button class="btn-icon btn-edit" onclick="Teacher.openClassModal('${c.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-delete" onclick="Teacher.deleteClass('${c.id}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <p class="text-muted"><i class="fas fa-book"></i> ${c.subject || 'No Subject'}</p>
+                <div class="class-footer">
+                    <span><i class="fas fa-user-graduate"></i> ${studentCount} Students</span>
+                    <button class="btn-text" onclick="Teacher.viewClassStudents('${c.name}')">View Students <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        `}).join('');
+    },
+
+    openClassModal: (classId = null) => {
+        const container = document.getElementById('modal-container');
+        const classes = Storage.get(Storage.KEYS.CLASSES);
+        const data = classId ? classes.find(c => c.id === classId) : null;
+
+        container.innerHTML = `
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>${data ? 'Edit' : 'Add'} Class</h2>
+                    <button class="btn-close" onclick="Teacher.closeModal()">&times;</button>
+                </div>
+                <form id="classForm" class="auth-form">
+                    <input type="hidden" id="class-id" value="${data ? data.id : ''}">
+                    <div class="form-group">
+                        <label>Class Name (e.g., Class 8)</label>
+                        <input type="text" id="className" value="${data ? data.name : ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Section (e.g., A)</label>
+                        <input type="text" id="section" value="${data ? data.section : ''}" required>
+                    </div>
+                     <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" id="subject" value="${data ? data.subject : ''}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Save Class</button>
+                </form>
+            </div>
+        `;
+        container.style.display = 'flex';
+
+        container.querySelector('form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            Teacher.saveClass();
+        });
+    },
+
+    saveClass: () => {
+        const id = document.getElementById('class-id').value;
+        const name = document.getElementById('className').value;
+        const section = document.getElementById('section').value;
+        const subject = document.getElementById('subject').value;
+
+        const classData = {
+            id: id || Utils.generateId(),
+            name,
+            section,
+            subject
+        };
+
+        if (id) {
+            Storage.update(Storage.KEYS.CLASSES, id, classData);
+            Utils.showToast('Class updated successfully', 'success');
+        } else {
+            Storage.create(Storage.KEYS.CLASSES, classData);
+            Utils.showToast('Class added successfully', 'success');
+        }
+
+        Teacher.closeModal();
+        Teacher.loadMyClasses();
+        Teacher.populateClassSelects(); // Update selects in other tabs
+    },
+
+    deleteClass: (id) => {
+        if (confirm('Are you sure you want to delete this class?')) {
+            Storage.delete(Storage.KEYS.CLASSES, id);
+            Teacher.loadMyClasses();
+            Teacher.populateClassSelects();
+            Utils.showToast('Class deleted', 'success');
+        }
+    },
+
+    viewClassStudents: (className) => {
+        const students = Storage.get(Storage.KEYS.STUDENTS).filter(s => s.class === className);
+        const viewContainer = document.getElementById('class-students-view');
+        const gridContainer = document.getElementById('classes-grid');
+
+        gridContainer.style.display = 'none';
+        viewContainer.style.display = 'block';
+
+        document.getElementById('viewing-class-title').textContent = `${className} Students`;
+
+        const tbody = document.querySelector('#class-students-table tbody');
+        if (students.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center">No students found in this class.</td></tr>';
+        } else {
+            tbody.innerHTML = students.map(s => `
+                <tr>
+                    <td>${s.roll}</td>
+                    <td>${s.name}</td>
+                    <td>${s.email}</td>
+                    <td>${s.parentContact || 'N/A'}</td>
+                </tr>
+            `).join('');
+        }
+    },
+
+    closeStudentView: () => {
+        document.getElementById('classes-grid').style.display = 'grid';
+        document.getElementById('class-students-view').style.display = 'none';
+    },
+
 
     // Attendance
     loadAttendanceList: () => {
@@ -106,7 +241,7 @@ const Teacher = {
                 <div class="assignment-footer">
                     <span><i class="far fa-calendar-alt"></i> ${a.dueDate}</span>
                     <div class="actions">
-                        <button class="btn-icon btn-edit" onclick="Teacher.editAssignment('${a.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-edit" onclick="Teacher.openAssignmentModal('${a.id}')"><i class="fas fa-edit"></i></button>
                         <button class="btn-icon btn-delete" onclick="Teacher.deleteAssignment('${a.id}')"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
